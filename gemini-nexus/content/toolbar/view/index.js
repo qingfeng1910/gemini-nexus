@@ -1,4 +1,6 @@
 
+
+
 // content/toolbar/view/index.js
 (function() {
     /**
@@ -80,7 +82,12 @@
         showAskWindow(rect, contextText, title, resetDrag) { return this.windowView.show(rect, contextText, title, resetDrag); }
         hideAskWindow() { this.windowView.hide(); }
         showLoading(msg) { this.windowView.showLoading(msg); }
-        showResult(text, title, isStreaming) { this.windowView.showResult(text, title, isStreaming); }
+        
+        // Pass optional isHtml flag
+        showResult(text, title, isStreaming, isHtml = false) { 
+            this.windowView.showResult(text, title, isStreaming, isHtml); 
+        }
+        
         showError(text) { this.windowView.showError(text); }
         toggleCopyIcon(success) { this.windowView.toggleCopyIcon(success); }
         setInputValue(text) { this.windowView.setInputValue(text); }

@@ -1,4 +1,3 @@
-
 // sandbox/app_controller.js
 import { appendMessage } from './render/message.js';
 import { sendToBackground, saveSessionsToStorage } from '../lib/messaging.js';
@@ -94,6 +93,15 @@ export class AppController {
 
         // 3. Focus Input (New: Automatically focus when session becomes active)
         this.ui.resetInput();
+    }
+    
+    // Refresh the current session view (useful when libraries load late)
+    rerender() {
+        const currentId = this.sessionManager.currentSessionId;
+        if (currentId) {
+            // Force a switch to the same session to trigger full re-render
+            this.switchToSession(currentId);
+        }
     }
     
     getSelectedModel() {

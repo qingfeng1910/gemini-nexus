@@ -1,4 +1,6 @@
 
+
+
 // content/toolbar/ui.js (formerly content_toolbar_ui.js)
 
 (function() {
@@ -28,6 +30,12 @@
             this.sourceInputElement = null;
             this.sourceSelectionRange = null;
             this.isGrammarMode = false;
+            
+            // Renderer properties
+            this.rendererIframe = null;
+            this.renderRequests = {};
+            this.reqId = 0;
+            this.latestRenderId = -1;
         }
 
         setCallbacks(callbacks) {
@@ -37,7 +45,9 @@
         build() {
             if (this.isBuilt) return;
             this._createHost();
+            this._initRenderer(); // Initialize background renderer
             this._render();
+            this._loadMathLibs();
             
             // Initialize Sub-components
             this.view = new View(this.shadow);
@@ -70,11 +80,55 @@
             document.documentElement.appendChild(this.host);
             this.shadow = this.host.attachShadow({ mode: 'closed' });
         }
+        
+        _initRenderer() {
+            this.rendererIframe = document.createElement('iframe');
+            this.rendererIframe.src = chrome.runtime.getURL('sandbox.html?mode=renderer');
+            this.rendererIframe.style.display = 'none';
+            // Append to main host (outside shadow) to ensure it loads
+            this.host.appendChild(this.rendererIframe);
+            
+            window.addEventListener('message', (e) => {
+                if (e.data.action === 'RENDER_RESULT') {
+                    const { html, reqId } = e.data;
+                    if (this.renderRequests[reqId]) {
+                        this.renderRequests[reqId](html);
+                        delete this.renderRequests[reqId];
+                    }
+                }
+            });
+        }
+        
+        async renderMarkdown(text) {
+            const id = this.reqId++;
+            return new Promise((resolve) => {
+                this.renderRequests[id] = resolve;
+                // Wait for iframe to be ready? Assuming it loads fast enough.
+                if (this.rendererIframe.contentWindow) {
+                     this.rendererIframe.contentWindow.postMessage({ action: 'RENDER', text, reqId: id }, '*');
+                } else {
+                     resolve(text); // Fallback
+                }
+            });
+        }
 
         _render() {
             const container = document.createElement('div');
             container.innerHTML = Templates.mainStructure;
             this.shadow.appendChild(container);
+        }
+
+        _loadMathLibs() {
+            // 1. Inject KaTeX CSS into Shadow DOM
+            const link = document.createElement('link');
+            link.rel = 'stylesheet';
+            link.href = 'https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css';
+            this.shadow.appendChild(link);
+            
+            const hljsLink = document.createElement('link');
+            hljsLink.rel = 'stylesheet';
+            hljsLink.href = 'https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css';
+            this.shadow.appendChild(hljsLink);
         }
 
         // --- Event Handlers (Called by ToolbarEvents) ---
@@ -90,6 +144,10 @@
 
         handleImageHover(isHovering) {
             this._fireCallback('onImageBtnHover', isHovering);
+        }
+
+        handleModelChange(model) {
+            this._fireCallback('onModelChange', model);
         }
 
         cancelAsk(e) {
@@ -144,6 +202,8 @@
         _fireCallback(type, ...args) {
             if (type === 'onImageBtnHover' && this.callbacks.onImageBtnHover) {
                 this.callbacks.onImageBtnHover(...args);
+            } else if (type === 'onModelChange' && this.callbacks.onModelChange) {
+                this.callbacks.onModelChange(...args);
             } else if (this.callbacks.onAction) {
                 this.callbacks.onAction(...args);
             }
@@ -175,9 +235,17 @@
             this.view.showLoading(msg);
         }
 
-        showResult(text, title, isStreaming) {
+        async showResult(text, title, isStreaming) {
             this.currentResultText = text;
-            this.view.showResult(text, title, isStreaming);
+            const currentId = this.reqId; // Snapshot current request ID tracker if needed, but simplified:
+            
+            // Delegate rendering to iframe (Offscreen Renderer)
+            const html = await this.renderMarkdown(text);
+            
+            // We only update if we are not stale? 
+            // In streaming, we always want the latest.
+            this.view.showResult(html, title, isStreaming, true);
+            
             // Show Insert/Replace buttons after streaming is done in grammar mode
             if (!isStreaming && this.isGrammarMode && this.sourceInputElement) {
                 this.showInsertReplaceButtons(true);

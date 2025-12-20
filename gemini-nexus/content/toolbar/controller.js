@@ -44,6 +44,7 @@
             this.ui.build();
             this.ui.setCallbacks({
                 onAction: this.handleAction,
+                onModelChange: (model) => this.handleModelChange(model),
                 onImageBtnHover: (isHovering) => {
                     if (isHovering) {
                         this.imageDetector.cancelHide();

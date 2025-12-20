@@ -1,4 +1,6 @@
 
+
+
 // content/toolbar/view/window.js
 (function() {
     const Utils = window.GeminiViewUtils;
@@ -83,7 +85,7 @@
             if (this.elements.footerActions) this.elements.footerActions.classList.add('hidden');
         }
 
-        showResult(text, title, isStreaming = false) {
+        showResult(text, title, isStreaming = false, isHtml = false) {
             if (!this.elements.askWindow) return;
             
             if (title) this.elements.windowTitle.textContent = title;
@@ -96,8 +98,29 @@
                 shouldScrollBottom = distanceToBottom <= threshold;
             }
             
-            this.elements.resultText.innerHTML = MarkdownRenderer.render(text);
+            if (isHtml) {
+                this.elements.resultText.innerHTML = text;
+            } else {
+                this.elements.resultText.innerHTML = MarkdownRenderer.render(text);
+            }
             
+            // Try to Render Math using KaTeX if available in context (unlikely in isolated world but harmless)
+            if (window.renderMathInElement) {
+                try {
+                    window.renderMathInElement(this.elements.resultText, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false},
+                            {left: '\\(', right: '\\)', display: false},
+                            {left: '\\[', right: '\\]', display: true}
+                        ],
+                        throwOnError: false
+                    });
+                } catch (e) {
+                    console.warn("Math Render Error:", e);
+                }
+            }
+
             // Ensure Footer is visible
             if (this.elements.windowFooter) this.elements.windowFooter.classList.remove('hidden');
 

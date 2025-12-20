@@ -24,7 +24,9 @@
         init() {
             // Mouse
             this.handle.addEventListener('mousedown', (e) => {
-                if (e.target.closest('button')) return;
+                // Fix: Allow interaction with buttons, selects, and inputs inside the header
+                if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+                
                 if (window.matchMedia("(max-width: 600px)").matches) return;
 
                 e.preventDefault();
@@ -33,7 +35,9 @@
 
             // Touch
             this.handle.addEventListener('touchstart', (e) => {
-                if (e.target.closest('button')) return;
+                // Fix: Allow interaction with buttons, selects, and inputs inside the header
+                if (e.target.closest('button') || e.target.closest('select') || e.target.closest('input')) return;
+                
                 if (window.matchMedia("(max-width: 600px)").matches) return;
 
                 const touch = e.touches[0];

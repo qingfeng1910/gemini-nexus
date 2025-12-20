@@ -94,6 +94,12 @@ class ToolbarActions {
     handleRetry() {
         if (!this.lastRequest) return;
         
+        // Fix: Update model in lastRequest to match currently selected model in UI
+        const currentModel = this.ui.getSelectedModel();
+        if (currentModel) {
+            this.lastRequest.model = currentModel;
+        }
+        
         const loadingMsg = this.isChinese() ? "正在重新生成..." : "Regenerating...";
         this.ui.showLoading(loadingMsg);
         chrome.runtime.sendMessage(this.lastRequest);

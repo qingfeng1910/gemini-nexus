@@ -1,4 +1,5 @@
 
+
 // content/toolbar/view/utils.js
 (function() {
     /**
@@ -119,8 +120,8 @@
                 const width = span.getBoundingClientRect().width;
                 select.parentNode.removeChild(span);
                 
-                // Add padding (12px * 2 = 24px) + slight buffer
-                select.style.width = `${width + 26}px`;
+                // Add padding (12px * 2 = 24px) + increased buffer (10px) = 34px
+                select.style.width = `${width + 34}px`;
             }
         }
     };

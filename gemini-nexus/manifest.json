@@ -49,6 +49,7 @@
         "content/toolbar/styles/markdown.js",
         "content/toolbar/styles/index.js",
         "content/toolbar/markdown/utils.js",
+        "content/toolbar/markdown/math.js",
         "content/toolbar/markdown/highlight.js",
         "content/toolbar/markdown/parser.js",
         "content/toolbar/markdown/renderer.js",
@@ -74,7 +75,7 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["logo.png"],
+      "resources": ["logo.png", "sandbox.html"],
       "matches": ["<all_urls>"]
     }
   ],

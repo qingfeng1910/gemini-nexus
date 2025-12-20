@@ -1,4 +1,5 @@
 
+
 // content/toolbar/styles/panel.js
 (function() {
     const LayoutStyles = `
@@ -134,6 +135,7 @@
             transition: all 0.2s;
             font-family: inherit;
             height: 32px;
+            line-height: 30px; /* Ensure vertical centering */
             box-sizing: border-box;
             text-align: center;
         }

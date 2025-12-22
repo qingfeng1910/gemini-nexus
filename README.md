@@ -44,24 +44,14 @@ Gemini Nexus 是一款深度集成 Google Gemini 能力的 Chrome 扩展程序�
 *   **Content Scripts**：注入到网页中的脚本，负责悬浮工具栏、划词监听和页面交互 (`content/`)。
 *   **Background**：插件的“大脑”，负责 API 通信、会话管理、账号轮询和自动化控制 (`background/`)。
 
-## 🛠️ 本地开发
+## 🚀 安装教程
 
-**前提条件：** 需安装 Node.js (建议 v18+)
-
-1.  **安装依赖：**
-    ```bash
-    npm install
-    ```
-
-2.  **构建项目：**
-    ```bash
-    npm run build
-    ```
-
-3.  **加载插件：**
-    *   打开 Chrome 浏览器，访问 `chrome://extensions/`。
-    *   开启右上角的“开发者模式”。
-    *   点击“加载已解压的扩展程序”，选择项目根目录（或 `dist` 目录）。
+1.  访问 [Releases](https://github.com/yeahhe365/gemini-nexus/releases) 页面。
+2.  下载最新版本的资源压缩包（例如 `gemini-nexus-v4.0.0.zip`）。
+3.  将下载的 ZIP 文件解压到本地文件夹。
+4.  打开 Chrome 浏览器（或 Edge 等 Chromium 浏览器），访问 `chrome://extensions/`。
+5.  在页面右上角开启**“开发者模式”**。
+6.  点击左上角的**“加载已解压的扩展程序”**，选择刚才解压出的文件夹即可完成安装。
 
 ## 📄 许可证
 
